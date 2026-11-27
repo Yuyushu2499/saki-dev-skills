@@ -66,6 +66,8 @@ class CollectionStructureTest(unittest.TestCase):
         self.assertTrue(manifest.get("description"))
         unknown = set(manifest.keys()) - ALLOWED_PLUGIN_FIELDS
         self.assertEqual(unknown, set(), f"Unknown plugin.json fields: {unknown}")
+        if manifest.get("logo"):
+            self.assertTrue((REPO_ROOT / manifest["logo"]).is_file(), f"Missing plugin logo: {manifest['logo']}")
 
         actual_agents = {p.stem for p in AGENTS_DIR.glob("*.md")}
         self.assertEqual(actual_agents, EXPECTED_AGENTS)
