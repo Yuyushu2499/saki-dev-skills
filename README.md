@@ -1,84 +1,128 @@
-English · [中文](README.zh-CN.md)
+<div align="center">
 
-# saki-dev-skills
+<img src="docs/assets/icons/saki.png" width="116" alt="Saki Dev Skills Logo" />
 
-<p align="center">
-  <img src="docs/assets/diagrams/system-architecture.png" width="100%" alt="saki-dev-skills architecture overview: Antigravity host, 9 core Agent Skills, MCP-stripped native subagents, PreToolUse do-not-edit guard, ExcalidrawZ MCP diagramming, explicit cross-CLI delegate, and GitHub push workflow.">
+<h1>Saki Dev Skills</h1>
+
+<p><strong>为 Google Antigravity 打造的原生工程化开发插件与 Agent Skills 套件</strong></p>
+
+<p>
+  9 个核心 Agent Skills · 3 个净身原生子 Agent · ExcalidrawZ MCP 智能配图 · PreToolUse 禁改守卫 · 默认纯内部闭环与显式跨 CLI 委托
 </p>
 
-An **Antigravity-native plugin** and standard Agent Skills toolkit for disciplined software development, adapted from [oil-dev-skills](https://github.com/oil-oil/oil-dev-skills). *(Editable Excalidraw source: [`docs/assets/diagrams/system-architecture.excalidraw`](docs/assets/diagrams/system-architecture.excalidraw).)*
+<p>
+  <strong>简体中文</strong> ·
+  <a href="README.en.md">English</a> ·
+  <a href="#安装方式">安装方式</a> ·
+  <a href="#架构全景">架构全景</a> ·
+  <a href="https://github.com/Yuyushu2499/saki-dev-skills/issues">问题反馈 (Issues)</a>
+</p>
 
-By default, every step stays **100% inside Antigravity** using built-in lightweight subagents (`saki-explorer`, `saki-reviewer`, `saki-coder`) with zero external CLI calls. When you explicitly ask in chat to invoke another CLI (such as Codex, Claude Code, or Cursor), `saki-delegate` activates and pops up an interactive model picker with a task-appropriate recommendation before running.
+<p>
+  <a href="plugin.json"><img src="https://img.shields.io/badge/Version-v1.0.0-3b82f6?style=flat-square" alt="Version v1.0.0" /></a>
+  <img src="https://img.shields.io/badge/Host-Antigravity%20Native%20Plugin-1e293b?style=flat-square" alt="Antigravity Native Plugin" />
+  <img src="https://img.shields.io/badge/Skills-9%20Included-7c3aed?style=flat-square" alt="9 Skills Included" />
+  <img src="https://img.shields.io/badge/Python-3.10%2B%20Stdlib-0f766e?style=flat-square" alt="Python 3.10+ Stdlib" />
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-16a34a?style=flat-square" alt="License MIT" /></a>
+  <a href="https://github.com/oil-oil/oil-dev-skills"><img src="https://img.shields.io/badge/Based%20on-oil--dev--skills-8b5cf6?style=flat-square" alt="Based on oil-dev-skills" /></a>
+</p>
 
-## What is included
+</div>
 
-### 1. Nine Agent Skills (`skills/`)
-- **Explore · [`saki-explore`](skills/saki-explore/SKILL.md)**: Read-only codebase inventory, call-chain tracing, reusable infrastructure discovery, and parallel exploration via `saki-explorer` (`flash`).
-- **Plan · [`saki-plan`](skills/saki-plan/SKILL.md)**: Complexity-graded planning (`L1` / `L2` / `L3`), independent plan critique via `saki-reviewer`, strict dispatch contracts with fast-rule test cadence, optional sub-agent mode, and a closing merge checklist.
-- **Code Review · [`saki-code-review`](skills/saki-code-review/SKILL.md)**: Risk-graded code diff review checking scope drift, `do-not-edit` boundaries, file bloat, and five-dimension quality in a clean `saki-reviewer` context.
-- **Bug Fix · [`saki-bug-fix`](skills/saki-bug-fix/SKILL.md)**: Root-cause debugging workflow—reproduce first, trace to the origin, fix at the source, scan systemic patterns, and run dual-path read-only diagnosis via `saki-reviewer` on stop-loss.
-- **Docs · [`saki-docs`](skills/saki-docs/SKILL.md)**: Generates living project documentation from real source code when onboarding a repository (`README.md`, `docs/architecture.md`, and on-demand API/data-model/module/ADR/changelog docs), incrementally syncs affected docs from `git diff` after user confirmation (Chinese by default), and supports smart diagram routing (Mermaid, local ExcalidrawZ MCP, or user-registered diagram providers).
-- **Comment · [`saki-comment`](skills/saki-comment/SKILL.md)**: Audits and adds idiomatic Chinese code comments & docstrings (Google Python / TSDoc / JSDoc / GoDoc / Rustdoc / Javadoc / Doxygen, explaining *Why* not *What*) while proactively removing misleading, redundant, or commented-out dead-code comments—strictly zero logic changes.
-- **Ship · [`saki-ship`](skills/saki-ship/SKILL.md)**: Pre-ship safety check (branch protection, sensitive files, remote sync) plus Chinese Conventional Commit (`feat:`/`fix:` + Chinese summary) and push—auto-ships on dev branches once tests pass, and pauses for confirmation on `main`/`master`.
-- **Govern · [`saki-govern`](skills/saki-govern/SKILL.md)**: Audits `AGENTS.md` / `GEMINI.md`, test tiering, `.agents/skills/` & `.agents/plugins/`, worktree merge state, and interactive branch boards (rendered via Antigravity `generative_ui` when available).
-- **Delegate · [`saki-delegate`](skills/saki-delegate/SKILL.md)**: Explicit-only cross-CLI delegation (`claude`, `codex`, `agy`, `cursor`, `opencode`, `workbuddy`, `dsh`, `grok`, `kimi`). Never triggered automatically—always prompts with `ask_question` to choose a model (with a task-based `(Recommended)` default) whenever no model is specified in your message.
+---
 
-### 2. Antigravity Native Enhancements
-- **Plugin manifest ([`plugin.json`](plugin.json))**: Install and toggle the entire bundle as a single plugin in Antigravity while keeping `skills/` compatible with other skill-based coding agents.
-- **Always-on plugin rules ([`rules/AGENTS.md`](rules/AGENTS.md))**: Automatically enforces Chinese commit + post-test delivery on dev branches (with `main`/`master` protection) and idiomatic Chinese commenting + bad-comment cleanup during everyday coding.
-- **Dedicated MCP-stripped subagents ([`agents/`](agents/saki-explorer.md))**:
-  - [`saki-explorer`](agents/saki-explorer.md): Strictly read-only (`read_file`, `run_command`, `inheritMcp: false`).
-  - [`saki-reviewer`](agents/saki-reviewer.md): Strictly read-only independent critic, reviewer, and risk checker (`inheritMcp: false`).
-  - [`saki-coder`](agents/saki-coder.md): Contract-bound implementer (`read_file`, `edit_file`, `write_file`, `run_command`, `manage_task`, `inheritMcp: false`).
-- **Upfront `do-not-edit` guard ([`hooks.json`](hooks.json) + [`hooks/guard_do_not_edit.py`](hooks/guard_do_not_edit.py))**: `PreToolUse` hook on `edit_file|write_file` that blocks edits matching `do-not-edit` patterns declared in your repository's `saki-dev` dev profile (`AGENTS.md`, `GEMINI.md`, or `CLAUDE.md`).
+## 架构全景
 
-## Installation
+<p align="center">
+  <img src="docs/assets/diagrams/system-architecture.png" width="100%" alt="saki-dev-skills 架构全景：Antigravity 宿主、9 个核心研发 Skill、原生净身子 Agent、PreToolUse 禁改守卫、ExcalidrawZ MCP 配图、显式跨 CLI 委托与 GitHub 自动推送流程。">
+</p>
 
-### Option 1: Install as an Antigravity Plugin (recommended)
+<p align="center">
+  <sub>使用 ExcalidrawZ MCP 绘制 · 可编辑源文件：<a href="docs/assets/diagrams/system-architecture.excalidraw"><code>docs/assets/diagrams/system-architecture.excalidraw</code></a></sub>
+</p>
 
-Clone or symlink this repository into your global or workspace Antigravity plugins folder:
+日常研发默认 **100% 在 Antigravity 内部闭环**（通过内置轻量净身子 Agent `saki-explorer` / `saki-reviewer` / `saki-coder` 完成探索、挑刺、实现、审查与排错，不自动调用外部 CLI）；只有在对话框中**显式要求调用其他 CLI**（如 Codex、Claude Code、Cursor 等）时，才会激活 `saki-delegate`，并在未指明模型时**每次弹出交互式模型选择卡片**（带按任务场景的默认推荐项）。
+
+---
+
+## 套件构成
+
+### 1. 九个核心 Skill（`skills/`）
+
+- **探索 · [`saki-explore`](skills/saki-explore/SKILL.md)**：严格只读的结构盘点与调用链追踪，大仓库默认按独立模块派发 `saki-explorer`（`flash` 模型）并行摸底。
+- **方案 · [`saki-plan`](skills/saki-plan/SKILL.md)**：按 `L1 / L2 / L3` 分级制定平实方案，默认由 `saki-reviewer` 独立挑刺，生成带测试与重构建控频红线的派发契约，支持子 Agent 模式与收尾合并清单。
+- **审查 · [`saki-code-review`](skills/saki-code-review/SKILL.md)**：先核对方案范围、禁改目录与文件膨胀，再由 `saki-reviewer` 在干净只读上下文执行五维深度审查。
+- **排错 · [`saki-bug-fix`](skills/saki-bug-fix/SKILL.md)**：先复现再定位根因，在坏数据源头修复，判断普遍问题并全仓排查，止损时默认开两路 `saki-reviewer` 并行诊断。
+- **文档 · [`saki-docs`](skills/saki-docs/SKILL.md)**：遵循“2 核心 + 4 按需”活文档体系（默认中文），支持中途接手项目从真实源码反推生成文档、随功能迭代按 `git diff` 列出影响清单经确认后精准增量同步，以及智能绘图路由（按场景推荐 Mermaid 或本机 ExcalidrawZ MCP 并弹窗确认，支持三级图标配图与扩展其他绘图工具）。
+- **注释 · [`saki-comment`](skills/saki-comment/SKILL.md)**：按多语言行业权威规范（Google Python / TSDoc / JSDoc / GoDoc / Rustdoc / Javadoc / Doxygen）为无注释老项目补全函数文档与核心块中文注释（只解释 Why 不复述 What），同时主动扫描清理过期误导、废话、作者日期与大段注释死代码，严格零逻辑改动。
+- **交付 · [`saki-ship`](skills/saki-ship/SKILL.md)**：交付前分支保护与敏感文件预检 + 中文提交规范（`Conventional Commits` 前缀 + 中文描述）并推送远端；开发分支测试通过后可直接自动提交推送，`main` / `master` 保护分支必须先确认，也可随时手动调用。
+- **治理 · [`saki-govern`](skills/saki-govern/SKILL.md)**：体检并治理 `AGENTS.md` / `GEMINI.md`、`.agents/skills/` 与 `.agents/plugins/`、快慢测试分层、Worktree 卫生，以及支持 Antigravity `generative_ui` 渲染的交互式分支看板。
+- **显式跨 CLI 委托 · [`saki-delegate`](skills/saki-delegate/SKILL.md)**：支持 9 种外部 CLI（`claude`、`codex`、`agy`、`cursor`、`opencode`、`workbuddy`、`dsh`、`grok`、`kimi`）。仅在你显式点名外部 CLI 时触发；只要本次未指明模型，每次均通过 `ask_question` 弹出模型选择卡片并给出按任务推荐的默认模型。
+
+### 2. Antigravity 原生增强能力
+
+- **原生 Plugin 清单（[`plugin.json`](plugin.json)）**：可作为单个插件在 Antigravity Customizations 页面一键启停，同时保留标准 `skills/` 结构兼容其他宿主。
+- **插件常驻工程规则（[`rules/AGENTS.md`](rules/AGENTS.md)）**：随插件开启自动生效——开发分支测试通过后自动按 `saki-ship` 中文提交推送（保护主分支），日常写代码自动补合理中文注释并顺手清理劣质注释。
+- **专用轻量净身子 Agent（`agents/`）**：全部设置 `inheritMcp: false` 剥离无关 MCP 底座 Token 开销：
+  - [`saki-explorer`](agents/saki-explorer.md)：纯只读探索子 Agent（无 `edit_file`/`write_file`）。
+  - [`saki-reviewer`](agents/saki-reviewer.md)：纯只读独立审查、方案挑刺与高危操作检查子 Agent。
+  - [`saki-coder`](agents/saki-coder.md)：严格遵循派发契约与快规则测试节奏的实现子 Agent。
+- **禁改目录事前硬拦截（[`hooks.json`](hooks.json) + [`hooks/guard_do_not_edit.py`](hooks/guard_do_not_edit.py)）**：`PreToolUse` 钩子自动读取目标仓库 `AGENTS.md` / `GEMINI.md` / `CLAUDE.md` 中 `saki-dev` 小节的 `禁改`（`do-not-edit`）规则，在 `edit_file` / `write_file` 动手前一瞬间直接拦截越界写入。
+
+---
+
+## 安装方式
+
+### 方式一：作为 Antigravity 原生 Plugin 安装（推荐）
+
+克隆或软链到全局插件目录（或项目 `.agents/plugins/`）：
 
 ```bash
-# Global (all workspaces)
+# 全局安装（对所有工作区生效）
 git clone https://github.com/Yuyushu2499/saki-dev-skills.git ~/.gemini/config/plugins/saki-dev-skills
 
-# Or workspace-specific
+# 或仅对当前项目生效
 git clone https://github.com/Yuyushu2499/saki-dev-skills.git .agents/plugins/saki-dev-skills
 ```
 
-### Option 2: Install standard `skills/` only
+### 方式二：仅安装标准 `skills/`
 
 ```bash
 npx skills add Yuyushu2499/saki-dev-skills
 ```
 
-## Project dev profile (`saki-dev`)
+---
 
-Add a section whose heading contains `saki-dev` to your repository's `AGENTS.md` (or `GEMINI.md`):
+## 项目开发约定（`saki-dev`）
+
+在目标仓库根目录的 `AGENTS.md`（或 `GEMINI.md`）中加入标题含 `saki-dev` 的小节：
 
 ```markdown
-## Dev profile (saki-dev)
+## 开发约定（saki-dev）
 
-- quick-test: `pytest tests/{target} -q`
-- merge-gate: `make ci`
-- high-risk: `src/storage/**`, `src/auth/**`, `migrations/`
-- do-not-edit: `vendor/`, `src/generated/**`
+- 快测：`pytest tests/{target} -q`
+- 门禁：`make ci`
+- 高风险：`src/storage/**`、`src/auth/**`、`migrations/`
+- 禁改：`vendor/`、`src/generated/**`
 ```
 
-Once configured, `saki-explore`, `saki-plan`, `saki-code-review`, `saki-govern`, and the `PreToolUse` hook read it directly. See [dev-profile.md](skills/saki-govern/references/dev-profile.md) for all supported keys.
+配置后，`saki-explore`、`saki-plan`、`saki-code-review`、`saki-govern` 与 `PreToolUse` 钩子都会直接读取该约定。详细字段见 [dev-profile.md](skills/saki-govern/references/dev-profile.md)。
 
-## Personal preferences
+## 个人偏好与本地配置
 
-User-specific preferences live in `~/.saki-dev/preferences.md` (override with `SAKI_DEV_HOME`). Cross-CLI delegate state lives in `~/.saki-delegate` (override with `SAKI_DELEGATE_HOME`). Neither is written into project repositories.
+- 个人偏好保存在 `~/.saki-dev/preferences.md`（可用环境变量 `SAKI_DEV_HOME` 覆盖）。
+- `saki-delegate` 的状态与运行产物保存在 `~/.saki-delegate`（可用 `SAKI_DELEGATE_HOME` 覆盖，二进制路径可用 `SAKI_DELEGATE_<RUNNER>_BIN` 覆盖）。
+- 图标共享仓默认位于 `~/.saki-dev/icons/`，配合 `saki-docs` 的 ExcalidrawZ MCP 绘图与嵌图脚本复用（详见 [diagram-providers.md](skills/saki-docs/references/diagram-providers.md)）。
+- 以上配置均仅存本机，不会写入项目仓库。
 
-## Maintenance and testing
+## 回归测试
 
-Run all unit tests without calling any models:
+无需调用任何模型即可在几秒内跑完全仓单元测试（含插件清单、常驻规则、子 Agent、Hook 拦截与全部 Skill 脚本）：
 
 ```bash
 python3 scripts/verify_repo.py
 ```
 
-## Attribution & License
+## 开源协议与致谢
 
-Adapted from [oil-oil/oil-dev-skills](https://github.com/oil-oil/oil-dev-skills) under the [MIT License](LICENSE).
+本项目基于 [oil-oil/oil-dev-skills](https://github.com/oil-oil/oil-dev-skills) 进行二次开发，遵循 [MIT License](LICENSE)。

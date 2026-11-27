@@ -94,7 +94,7 @@ class CollectionStructureTest(unittest.TestCase):
         self.assertLess(rules_path.stat().st_size, 24_000, "rules/AGENTS.md exceeds 24 KB Antigravity limit")
 
     def test_root_readmes_mention_all_skills_and_have_valid_local_links(self) -> None:
-        for readme_name in ("README.md", "README.zh-CN.md"):
+        for readme_name in ("README.md", "README.en.md"):
             readme = REPO_ROOT / readme_name
             self.assertTrue(readme.is_file(), f"Missing {readme_name}")
             content = readme.read_text(encoding="utf-8")
