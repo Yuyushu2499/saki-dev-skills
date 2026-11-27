@@ -20,6 +20,7 @@ EXPECTED_SKILLS = {
     "saki-code-review",
     "saki-govern",
     "saki-bug-fix",
+    "saki-docs",
 }
 EXPECTED_AGENTS = {
     "saki-explorer",
@@ -181,6 +182,7 @@ class CollectionStructureTest(unittest.TestCase):
             SKILLS_DIR / "saki-delegate" / "scripts" / "delegate.py",
             SKILLS_DIR / "saki-code-review" / "scripts" / "review_helper.py",
             SKILLS_DIR / "saki-govern" / "scripts" / "audit_repo.py",
+            SKILLS_DIR / "saki-docs" / "scripts" / "doc_helper.py",
         ]
         for script in scripts:
             proc = subprocess.run(
