@@ -1,6 +1,6 @@
 # 文档绘图引擎与可扩展适配器规范（Diagram Providers）
 
-本文配合 `saki-docs` 使用，规定如何在文档中智能选择绘图方式、调用本机 **ExcalidrawZ MCP** 或 **Mermaid**，以及如何以插件化方式扩展接入其他绘图工具。
+本文配合 `saki-docs` 使用，规定如何在文档中智能选择绘图方式、调用本机 **ExcalidrawZ MCP** 或 **Mermaid**、规范文件命名与存储落盘，以及如何扩展接入其他绘图工具。
 
 ---
 
@@ -10,9 +10,9 @@
 
 | 图表场景 | 推荐引擎 | 判断依据 |
 | --- | --- | --- |
-| 复杂系统架构全景图、多子系统/多端拓扑图、概念草图、需要高颜值视觉表达或手工微调排版的大图 | **ExcalidrawZ（本地 MCP）** | 自由布局空间大、视觉清晰度远高于纯文本自动排版，支持导出 SVG/PNG 并保留可编辑白板 |
+| 复杂系统架构全景图、多子系统/多端拓扑图、概念草图、需要高颜值视觉表达或手工微调排版的大图 | **ExcalidrawZ（本地 MCP）** | 自由布局空间大、视觉清晰度远高于纯文本自动排版，导出 PNG 所见即所得不跑版，同时保留可编辑 `.excalidraw` 源文件 |
 | 简洁流程图、时序图（`sequenceDiagram`）、状态机（`stateDiagram-v2`）、ER 数据模型（`erDiagram`）、轻量类图、高频随代码同步的文档插图 | **Mermaid（Markdown 内嵌）** | 纯文本版本管理友好、Git diff 清晰、GitHub / IDE / Antigravity 原生免构建渲染 |
-| 核心 `docs/architecture.md` 既要纯文本离线可读，又要高清白板便于评审与演示 | **两者都要** | Markdown 保留轻量 Mermaid 骨架，同时用 ExcalidrawZ 生成高清白板并按需导出图片 |
+| 核心 `docs/architecture.md` 既要纯文本离线可读，又要高清白板便于评审与演示 | **两者都要** | Markdown 保留轻量 Mermaid 骨架，同时用 ExcalidrawZ 生成高清白板并导出 PNG |
 
 ### 绘图前确认弹窗（`ask_question`）
 每次准备绘图前（除非用户本次指令已明确指定“用 Mermaid 画”或“用 ExcalidrawZ 画”），调用 `ask_question` 弹出单选选项：
@@ -42,10 +42,38 @@
   }
   ```
   *（Antigravity 原生支持 Streamable HTTP，直接填 `url` 即可；若端口不同，按 ExcalidrawZ 连接面板显示的实际端口修改。）*
-- **调用流程**：
-  1. 检查当前会话工具清单中是否已加载 `excalidrawz` 相关 MCP 工具；
-  2. **已连接时**：首次调用先执行 ExcalidrawZ MCP 自带的 `read_me` 工具获取当前可用工具与元素格式说明，再打开/新建画布并调用对应写工具（如 `replace_view` 等）绘制并合理分层排版；若用户需要把图片嵌入 Markdown，则导出为 SVG/PNG 存到文档同级 `assets/`（如 `docs/assets/<diagram-name>.svg`），并在 Markdown 中使用相对路径引用 `![图名](./assets/<diagram-name>.svg)`；
-  3. **未连接或 ExcalidrawZ 未启动时**：如实提示用户打开 ExcalidrawZ 并确认 MCP 运行中，同时询问是否先回退为 Mermaid 绘制，绝不静默失败或假装已画完。
+
+#### 存储目录与命名标准
+1. **项目仓库落盘目录（默认随 Git 托管）**：统一存放在目标仓库的 **`docs/assets/diagrams/`** 下。
+2. **文件命名规范（严格小写英文 kebab-case）**：
+   - 格式：`<范围或模块>-<图类型>.<扩展名>`（仅多张强顺序图时加两位序号前缀 `01-`、`02-`）
+   - 统一 `<图类型>` 词表：
+     - `architecture`（系统/模块架构）
+     - `flow`（业务或调用流程）
+     - `sequence`（交互时序）
+     - `data-model`（数据模型/存储结构）
+     - `topology`（部署/多端拓扑）
+     - `state`（状态机流转）
+   - 同名配对示例：
+     - 可编辑源文件：`docs/assets/diagrams/system-architecture.excalidraw`
+     - Markdown 嵌入图：`docs/assets/diagrams/system-architecture.png`
+     - 模块流程图：`docs/assets/diagrams/export-pipeline-flow.excalidraw` + `export-pipeline-flow.png`
+3. **ExcalidrawZ iCloud 图库画布名**（仅当未授权 Local Folder 而使用图库模式时）：
+   - 优先通过 `list_groups` 放入与项目同名的分组（无对应分组时提示用户建立），画布命名为：`[<项目名>] <模块或主题> - <图类型>`（如 `[saki-dev-skills] 系统架构 - architecture`），避免不同项目重名混淆。
+4. **导出格式与视觉质量**：
+   - **默认导出 `.png`**（高清、带纯色背景，避免 GitHub 深色模式下黑线隐身，且彻底规避跨平台中文字体回退跑版问题）；仅在用户显式指定矢量格式时改导出 `.svg`。
+   - **默认保留 `.excalidraw` 源文件**在 `docs/assets/diagrams/` 中与 `.png` 严格同名配对，确保随时可重新打开增量编辑。
+   - **Markdown 引用**：统一使用相对路径（如 `![系统架构图](./assets/diagrams/system-architecture.png)`），方便 `saki-govern` 自动做死链校验。
+
+#### 标准调用与增量更新流程
+1. 检查当前会话工具清单中是否已加载 `excalidrawz` 相关 MCP 工具；未连接或 ExcalidrawZ 未启动时，如实提示用户打开 ExcalidrawZ 并询问是否先回退为 Mermaid，绝不静默失败。
+2. **首次调用先执行 `read_me`** 获取 ExcalidrawZ 当前可用工具与元素格式说明。
+3. **新建或打开源文件**：
+   - 先查 `list_local_folders`：若目标仓库目录已授权，优先用 `create_local_file` / `open_local_file` 直接操作 `docs/assets/diagrams/<name>.excalidraw`；
+   - 未授权 Local Folder 时，在 iCloud 图库中用 `create_file` / `open_file` 绘制，再通过 `export` 导出 `.excalidraw` 与 `.png` 到 `docs/assets/diagrams/`。
+4. **绘制、原地更新与视觉自检**：
+   - 全新绘图或大幅重排用 `replace_view`；既有图局部调整优先打开原图并用 `adjust_elements` **原地更新**（直接覆盖同名 `.png` 与 `.excalidraw`，严禁堆积 `v1 / v2 / final` 副本）。
+   - 每次绘图或修改完成后，必须调用 **`read_canvas_image`** 检查画面排版（无文字截断、无框线重叠、箭头方向清晰、背景可读），确认无误再导出落盘并写入 Markdown 引用。
 
 ---
 
@@ -58,14 +86,14 @@
    ## saki-docs
 
    - 扩展绘图工具：
-     - `drawio`（MCP: drawio-mcp）：用于 UML / 网络拓扑图，导出至 `docs/assets/`
-     - `d2`（CLI: `d2 <src.d2> <out.svg>`）：用于代码生成的清晰架构图
+     - `drawio`（MCP: drawio-mcp）：用于 UML / 网络拓扑图，导出至 `docs/assets/diagrams/`
+     - `d2`（CLI: `d2 <src.d2> <out.png>`）：用于代码生成的清晰架构图
    ```
 2. **项目级约定**（目标仓库 `AGENTS.md` / `GEMINI.md`）：声明项目统一使用的绘图引擎（如 `PlantUML`、`Graphviz dot`、`D2`、`Figma MCP`）及导出目录。
 
 ### 扩展引擎接入契约
 无论接入哪种外部绘图工具，均遵循相同的输入输出约定：
-- **输入**：图表目标与类型、核心节点与连接关系（全部来自已核实代码事实）、目标 Markdown 路径、资产导出目录（默认 `docs/assets/`）。
+- **输入**：图表目标与类型、核心节点与连接关系（全部来自已核实代码事实）、目标 Markdown 路径、资产导出目录（默认 `docs/assets/diagrams/`）。
 - **输出**：
   - 文本型 DSL（如 Mermaid / PlantUML / D2）：内嵌代码块或保存源文件 + 渲染产物；
-  - 画布型工具（如 ExcalidrawZ / Draw.io / Figma MCP）：生成/更新画布，并按需导出 SVG/PNG 相对路径嵌入 Markdown，同时记录源文件或画布名称以便后续增量维护。
+  - 画布型工具（如 ExcalidrawZ / Draw.io / Figma MCP）：生成/更新画布，默认在 `docs/assets/diagrams/` 保留同名源文件与 `.png` 导出图（按 `<模块>-<图类型>` 命名），并以相对路径嵌入 Markdown。
