@@ -100,4 +100,5 @@ metadata:
 - [references/doc-templates.md](references/doc-templates.md)：创建或更新 `README.md`、`docs/architecture.md`、`docs/api.md` / `docs/data-model.md`、`docs/modules/`、ADR 与 `CHANGELOG.md` 时阅读，含精简结构规范与反模式清单。
 - [references/diagram-providers.md](references/diagram-providers.md)：文档需要画架构图、流程图或接入 ExcalidrawZ MCP 及其他自定义绘图工具时阅读，含场景推荐规则、弹窗流程与可扩展契约。
 - [scripts/doc_helper.py](scripts/doc_helper.py)：零第三方依赖的文档现状盘点（`inventory`）与基于 `git diff` 的文档影响面分析脚本（`impact`）。
-- [tests/test_doc_helper.py](tests/test_doc_helper.py)：`doc_helper.py` 的回归测试，仅在修改脚本时运行。
+- [scripts/excalidraw_icons.py](scripts/excalidraw_icons.py)：向 `.excalidraw` 嵌入本地 PNG/SVG 图标与原地替换 `icon:<名称>` 占位框的工具脚本。
+- [tests/test_doc_helper.py](tests/test_doc_helper.py)、[tests/test_excalidraw_icons.py](tests/test_excalidraw_icons.py)：两个脚本的回归测试，仅在修改脚本时运行。

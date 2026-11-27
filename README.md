@@ -2,7 +2,11 @@ English · [中文](README.zh-CN.md)
 
 # saki-dev-skills
 
-An **Antigravity-native plugin** and standard Agent Skills toolkit for disciplined software development, adapted from [oil-dev-skills](https://github.com/oil-oil/oil-dev-skills).
+<p align="center">
+  <img src="docs/assets/diagrams/system-architecture.png" width="100%" alt="saki-dev-skills architecture overview: Antigravity host, 9 core Agent Skills, MCP-stripped native subagents, PreToolUse do-not-edit guard, ExcalidrawZ MCP diagramming, explicit cross-CLI delegate, and GitHub push workflow.">
+</p>
+
+An **Antigravity-native plugin** and standard Agent Skills toolkit for disciplined software development, adapted from [oil-dev-skills](https://github.com/oil-oil/oil-dev-skills). *(Editable Excalidraw source: [`docs/assets/diagrams/system-architecture.excalidraw`](docs/assets/diagrams/system-architecture.excalidraw).)*
 
 By default, every step stays **100% inside Antigravity** using built-in lightweight subagents (`saki-explorer`, `saki-reviewer`, `saki-coder`) with zero external CLI calls. When you explicitly ask in chat to invoke another CLI (such as Codex, Claude Code, or Cursor), `saki-delegate` activates and pops up an interactive model picker with a task-appropriate recommendation before running.
 

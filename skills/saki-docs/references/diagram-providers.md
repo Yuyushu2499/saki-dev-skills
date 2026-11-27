@@ -65,14 +65,33 @@
    - **默认保留 `.excalidraw` 源文件**在 `docs/assets/diagrams/` 中与 `.png` 严格同名配对，确保随时可重新打开增量编辑。
    - **Markdown 引用**：统一使用相对路径（如 `![系统架构图](./assets/diagrams/system-architecture.png)`），方便 `saki-govern` 自动做死链校验。
 
+#### 三级图标与视觉表现规范（拒绝纯方框）
+绘制架构图、流程图或系统拓扑图时，只要涉及具体软件、平台、数据库、外部服务或特色角色，**不得清一色只用单调白方框**，按以下三级优先级配图：
+
+1. **第一优先：ExcalidrawZ 素材库（最原生）**
+   - 绘图前先调用 `list_libraries` / `list_library_items` 检索用户素材库中的匹配图标；
+   - 命中后直接用 `add_library_item_to_canvas(library_id, item_id, x, y)` 摆放到画布，再用 `adjust_elements` 调整连线与标注（**注意**：`replace_view` 会清空画布上的已有图片与素材库元素，贴完图标后严禁再用 `replace_view` 覆盖）。
+2. **第二优先：嵌入真实 PNG/SVG 品牌 Logo 或自定义配图（`excalidraw_icons.py`）**
+   - 图标优先从本机共享图标仓 `~/.saki-dev/icons/` 与项目内 `assets/` / `docs/assets/icons/` 查找（可先跑 `python3 "$SKILL_DIR"/scripts/excalidraw_icons.py list-icons`）；缺少特色配图时可调用 Antigravity `image-generator` 生成简洁配图，或生成标准简洁矢量 SVG 图标。
+   - 推荐流水线：先在 ExcalidrawZ 用 `replace_view` 画好整体布局、文字、箭头与带标记的占位框（占位框标签写 `icon:<名称>`，如 `icon:github`、`icon:excalidrawz`），导出或落盘为 `docs/assets/diagrams/<name>.excalidraw` → 运行：
+     ```text
+     python3 "$SKILL_DIR"/scripts/excalidraw_icons.py replace-placeholders \
+       docs/assets/diagrams/<name>.excalidraw \
+       --icon-dir docs/assets/icons
+     ```
+     脚本会自动把占位框原地替换为等比居中的标准 Excalidraw `image` 元素（内嵌 base64 `dataURL`）并**保留指向占位框的所有箭头绑定** → 再在 ExcalidrawZ 中打开验证与导出高清 `.png`（注意：若原文件正处于 ExcalidrawZ 打开状态，直接改磁盘文件不会触发内存画布重载，需另存一个新文件名再调 `open_local_file` 载入后导出，完事后清理临时文件）。
+3. **第三优先（无对应品牌 Logo 时的兜底视觉层次）**
+   - 按语义区分形状与柔和色板：核心协调者用醒目主色圆角框或自由大字节点（如 `Router` → `Worker`），外部服务用虚线分组框，数据存储用椭圆/圆柱组合，辅以简洁中文说明与箭头标注。
+
 #### 标准调用与增量更新流程
 1. 检查当前会话工具清单中是否已加载 `excalidrawz` 相关 MCP 工具；未连接或 ExcalidrawZ 未启动时，如实提示用户打开 ExcalidrawZ 并询问是否先回退为 Mermaid，绝不静默失败。
-2. **首次调用先执行 `read_me`** 获取 ExcalidrawZ 当前可用工具与元素格式说明。
+2. **首次调用先执行 `read_me` 与 `list_libraries`** 获取当前工具说明与用户已有素材库。
 3. **新建或打开源文件**：
    - 先查 `list_local_folders`：若目标仓库目录已授权，优先用 `create_local_file` / `open_local_file` 直接操作 `docs/assets/diagrams/<name>.excalidraw`；
-   - 未授权 Local Folder 时，在 iCloud 图库中用 `create_file` / `open_file` 绘制，再通过 `export` 导出 `.excalidraw` 与 `.png` 到 `docs/assets/diagrams/`。
-4. **绘制、原地更新与视觉自检**：
-   - 全新绘图或大幅重排用 `replace_view`；既有图局部调整优先打开原图并用 `adjust_elements` **原地更新**（直接覆盖同名 `.png` 与 `.excalidraw`，严禁堆积 `v1 / v2 / final` 副本）。
+   - 未授权 Local Folder 时，在 iCloud 图库中用 `create_file` / `open_file` 绘制，再通过 `export(kind="file")` 与 `export(kind="image", format="png", export_scale=2, with_background=true)` 落盘到 `docs/assets/diagrams/`。
+4. **绘制、嵌图、原地更新与视觉自检**：
+   - 全新绘图或大幅重排用 `replace_view`；既有图或含图标/素材库元素的画布做局部调整时用 `adjust_elements` **原地更新**（直接覆盖同名 `.png` 与 `.excalidraw`，严禁堆积 `v1 / v2 / final` 副本）。
+   - 需要嵌入真实 PNG/SVG 图标时，按上方 `excalidraw_icons.py` 流水线替换占位框后再打开校验。
    - 每次绘图或修改完成后，必须调用 **`read_canvas_image`** 检查画面排版（无文字截断、无框线重叠、箭头方向清晰、背景可读），确认无误再导出落盘并写入 Markdown 引用。
 
 ---

@@ -191,6 +191,7 @@ class CollectionStructureTest(unittest.TestCase):
             SKILLS_DIR / "saki-code-review" / "scripts" / "review_helper.py",
             SKILLS_DIR / "saki-govern" / "scripts" / "audit_repo.py",
             SKILLS_DIR / "saki-docs" / "scripts" / "doc_helper.py",
+            SKILLS_DIR / "saki-docs" / "scripts" / "excalidraw_icons.py",
             SKILLS_DIR / "saki-ship" / "scripts" / "ship_helper.py",
             SKILLS_DIR / "saki-comment" / "scripts" / "comment_helper.py",
         ]

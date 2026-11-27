@@ -2,7 +2,11 @@
 
 # saki-dev-skills
 
-面向 **Antigravity 原生闭环**深度定制的工程化开发插件与 Agent Skills 套件，基于 [oil-dev-skills](https://github.com/oil-oil/oil-dev-skills) 二次开发。
+<p align="center">
+  <img src="docs/assets/diagrams/system-architecture.png" width="100%" alt="saki-dev-skills 架构全景：Antigravity 宿主、9 个核心研发 Skill、原生净身子 Agent、PreToolUse 禁改守卫、ExcalidrawZ MCP 配图、显式跨 CLI 委托与 GitHub 自动推送流程。">
+</p>
+
+面向 **Antigravity 原生闭环**深度定制的工程化开发插件与 Agent Skills 套件，基于 [oil-dev-skills](https://github.com/oil-oil/oil-dev-skills) 二次开发。*（可编辑架构图源文件：[`docs/assets/diagrams/system-architecture.excalidraw`](docs/assets/diagrams/system-architecture.excalidraw)）*
 
 日常研发默认 **100% 在 Antigravity 内部闭环**（通过插件内置的轻量净身子 Agent `saki-explorer` / `saki-reviewer` / `saki-coder` 完成探索、挑刺、实现、审查与排错，不自动调用任何外部 CLI）；只有在对话框中**显式要求调用其他 CLI**（如 Codex、Claude Code、Cursor 等）时，才会激活 `saki-delegate`，并在未指明模型时**每次弹出交互式模型选择卡片**（带按任务场景的默认推荐项）。
 
