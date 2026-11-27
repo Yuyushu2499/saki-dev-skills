@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""运行 oil-dev-skills 全部单元测试与子 Skill 结构检查（Python 3.10+ 标准库）。"""
+"""运行 saki-dev-skills 全部单元测试与子 Skill 结构检查（Python 3.10+ 标准库）。"""
 
 from __future__ import annotations
 
@@ -15,19 +15,19 @@ if sys.version_info < (3, 10):
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SKILLS_ROOT = REPO_ROOT / "skills"
 EXPECTED_SKILLS = (
-    "oil-explore",
-    "oil-plan",
-    "oil-delegate",
-    "oil-code-review",
-    "oil-govern",
-    "oil-bug-fix",
+    "saki-explore",
+    "saki-plan",
+    "saki-delegate",
+    "saki-code-review",
+    "saki-govern",
+    "saki-bug-fix",
 )
 UNIVERSAL_SKILLS = {
-    "oil-explore",
-    "oil-plan",
-    "oil-code-review",
-    "oil-govern",
-    "oil-bug-fix",
+    "saki-explore",
+    "saki-plan",
+    "saki-code-review",
+    "saki-govern",
+    "saki-bug-fix",
 }
 
 

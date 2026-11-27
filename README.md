@@ -1,122 +1,55 @@
 English · [中文](README.zh-CN.md)
 
-<p align="center">
-  <img src="./assets/readme/hero.svg" width="100%" alt="oil-dev-skills: a development workflow for AI coding agents. Explore and plan on main; delegate implementation and run independent code review in a worktree; pass the merge gate back to main, then govern. After exploration, a separate bug-fix branch finds the root cause before fixing and merges back to main.">
-</p>
+# saki-dev-skills
 
-`oil-dev-skills` is a set of six Agent Skills that work together. Once installed in a skill-compatible coding agent such as Claude Code or Codex, you can invoke them in plain language. They break a change into five steps: map the existing code, write a plan you can actually read, hand off implementation under a clear contract, review the diff in a clean context, and tidy up docs, tests, and worktrees at the end of a milestone. For bugs with an unknown cause, a dedicated path finds the root cause before changing production code.
+An **Antigravity-native plugin** and standard Agent Skills toolkit for disciplined software development, adapted from [oil-dev-skills](https://github.com/oil-oil/oil-dev-skills).
 
-Each skill also works on its own. Small changes don't need the full workflow—the agent explains the change, edits the code directly, and runs the relevant quick tests.
+By default, every step stays **100% inside Antigravity** using built-in lightweight subagents (`saki-explorer`, `saki-reviewer`, `saki-coder`) with zero external CLI calls. When you explicitly ask in chat to invoke another CLI (such as Codex, Claude Code, or Cursor), `saki-delegate` activates and pops up an interactive model picker with a task-appropriate recommendation before running.
 
-## What problems it solves
+## What is included
 
-As a project grows, asking an AI agent to edit code directly often runs into the same issues. Each one maps to a specific practice in this workflow:
+### 1. Six Agent Skills (`skills/`)
+- **Explore · [`saki-explore`](skills/saki-explore/SKILL.md)**: Read-only codebase inventory, call-chain tracing, reusable infrastructure discovery, and parallel exploration via `saki-explorer` (`flash`).
+- **Plan · [`saki-plan`](skills/saki-plan/SKILL.md)**: Complexity-graded planning (`L1` / `L2` / `L3`), independent plan critique via `saki-reviewer`, strict dispatch contracts with fast-rule test cadence, optional sub-agent mode, and a closing merge checklist.
+- **Code Review · [`saki-code-review`](skills/saki-code-review/SKILL.md)**: Risk-graded code diff review checking scope drift, `do-not-edit` boundaries, file bloat, and five-dimension quality in a clean `saki-reviewer` context.
+- **Bug Fix · [`saki-bug-fix`](skills/saki-bug-fix/SKILL.md)**: Root-cause debugging workflow—reproduce first, trace to the origin, fix at the source, scan systemic patterns, and run dual-path read-only diagnosis via `saki-reviewer` on stop-loss.
+- **Govern · [`saki-govern`](skills/saki-govern/SKILL.md)**: Audits `AGENTS.md` / `GEMINI.md`, test tiering, `.agents/skills/` & `.agents/plugins/`, worktree merge state, and interactive branch boards (rendered via Antigravity `generative_ui` when available).
+- **Delegate · [`saki-delegate`](skills/saki-delegate/SKILL.md)**: Explicit-only cross-CLI delegation (`claude`, `codex`, `agy`, `cursor`, `opencode`, `workbuddy`, `dsh`, `grok`, `kimi`). Never triggered automatically—always prompts with `ask_question` to choose a model (with a task-based `(Recommended)` default) whenever no model is specified in your message.
 
-- **Writing duplicate helpers before understanding the existing code.** `oil-explore` traces call chains in read-only mode first and lists existing components and functions you can reuse.
-- **Plans that read like low-level implementation dumps.** `oil-plan` explains changes in terms of what changes externally, what gets reused, and what is out of scope this time, pulling out the trade-offs that need your call.
-- **Running the full test suite after every two lines of code.** The dispatch contract limits mid-coding checks to second-level compile, typecheck, and lint runs, followed by quick tests related to the change once coding is done. Full test suites and builds wait until the merge gate.
-- **Diffs that drift beyond the agreed plan, touch restricted directories, or keep piling new features onto mega-files.** Before review starts, a helper script compares the diff against the confirmed plan and project conventions and flags out-of-scope files, do-not-edit paths, and oversized code file growth upfront.
-- **Quick tests quietly growing slow, or heavy native builds re-running after unrelated edits.** `oil-govern` checks whether quick tests support scoped filtering and tracks oversized code files, while the dev profile lets you declare optional `heavy-build` triggers and a `file-limit`—and turn recurring hard rules into repo-local static checks.
-- **Patching symptoms while the same bug pattern remains elsewhere.** `oil-bug-fix` reproduces the failure and traces the root cause so the fix happens where bad data originates. It then checks whether the issue is systemic—if so, it scans the repo, fixes matching cases together, and proposes a deterministic check or review rule so it doesn't come back.
-- **`AGENTS.md` growing bloated, drifting out of sync with the code, and stale worktrees piling up.** `oil-govern` trims `AGENTS.md` into a task-routed entrypoint, deduplicates rules copied across topic docs and repo-local skills, and checks documentation links, freshness, test tiering, and worktree merge status before proposing cleanup.
-- **Losing track of branches: an agent editing in another worktree, local `main` drifting from the remote, work that only exists on one machine.** `oil-govern` builds a branch board that shows where every branch lives, whether it is pushed and merged, what it changes, and what to do with it, with its own recommendation for each one.
-
-## Check scope before reviewing
-
-Here is a real run on a sample repository. Its `AGENTS.md` marks `src/storage/` as high-risk and `vendor/` as do-not-edit, while the confirmed plan only allows changes under `src/export/**` and `tests/**`. Once implementation finishes, `oil-code-review`'s helper script flags three groups of files before the review itself begins:
-
-<p align="center">
-  <img src="./assets/readme/review-check.svg" width="100%" alt="On the left are the dev profile in AGENTS.md and the allowed scope from the confirmed plan. On the right is the output from review_helper.py: src/storage/project_file.py falls under a high-risk path, vendor/ffmpeg/wrap.py falls under a do-not-edit path, and 3 files fall outside the plan's allowed scope.">
-</p>
-
-The review then handles each group differently:
-
-- **High-risk paths** go to an agent with a clean context for an independent deep review.
-- **Do-not-edit paths** are treated as blocking issues unless the confirmed plan explicitly allowed them.
-- **Files outside the plan scope** are checked one by one: necessary additions are explained to you, while opportunistic drive-by edits are marked as blocking.
-
-## The six skills
-
-- **Explore · [`oil-explore`](skills/oil-explore/SKILL.md)**: Takes a read-only inventory of directory size, convention files, and working test and build commands. On larger repositories, it dispatches read-only sub-agents by module to trace call chains in parallel.
-- **Plan · [`oil-plan`](skills/oil-plan/SKILL.md)**: Scales across three levels. Small edits go straight to code; regular features align on a plan in chat; cross-module changes become a written spec that can fan out across multiple worktrees. Regular and cross-module plans get an independent critique before you see them. After implementation, it verifies the result and merges through a closing checklist. When you ask for sub-agent mode, the main agent only makes decisions—splitting work, writing contracts, making calls, and accepting results—while sub-agents do all the exploring, coding, debugging, review, and gate runs.
-- **Delegate · [`oil-delegate`](skills/oil-delegate/SKILL.md)**: Hands off a well-bounded task to locally installed CLI agents such as Claude Code, Codex, or Antigravity, returns structured results to your current session, and lets you follow up in the same thread. It can remember which agent you prefer for code review, plan critique, debugging consultations, and implementation.
-- **Review · [`oil-code-review`](skills/oil-code-review/SKILL.md)**: Reviews code diffs only, and triggers proactively before delivery, commit, PR, or merge on non-trivial features, refactors, and bug fixes. It checks scope drift and oversized file growth first, then grades by risk: fast lightweight checks for low-risk edits, and a five-part deep review in a clean context for core logic, high-risk, or oversized changes—covering end-to-end business and build verification, reuse, redundancy, runtime failure modes, and security and compatibility.
-- **Bug Fix · [`oil-bug-fix`](skills/oil-bug-fix/SKILL.md)**: Handles bugs whose cause isn't obvious yet. It reproduces the issue with a failing test, locates the root cause through git bisect, backward value tracing, or controlled experiments, and fixes where the bad state starts. If the pattern is systemic, it scans the repo to fix matching spots together and proposes an automated check or review rule. Small fixes with a known cause go straight through `oil-plan`.
-- **Govern · [`oil-govern`](skills/oil-govern/SKILL.md)**: Audits documentation, test tiers, and git worktrees, shows a branch board with a recommendation for every unmerged branch, helps generate and maintain your project's dev profile, and turns hard project rules into deterministic repo checks. The board is drawn as UI when your agent can render it, and as Markdown otherwise.
+### 2. Antigravity Native Enhancements
+- **Plugin manifest ([`plugin.json`](plugin.json))**: Install and toggle the entire bundle as a single plugin in Antigravity while keeping `skills/` compatible with other skill-based coding agents.
+- **Dedicated MCP-stripped subagents ([`agents/`](agents/saki-explorer.md))**:
+  - [`saki-explorer`](agents/saki-explorer.md): Strictly read-only (`read_file`, `run_command`, `inheritMcp: false`).
+  - [`saki-reviewer`](agents/saki-reviewer.md): Strictly read-only independent critic, reviewer, and risk checker (`inheritMcp: false`).
+  - [`saki-coder`](agents/saki-coder.md): Contract-bound implementer (`read_file`, `edit_file`, `write_file`, `run_command`, `manage_task`, `inheritMcp: false`).
+- **Upfront `do-not-edit` guard ([`hooks.json`](hooks.json) + [`hooks/guard_do_not_edit.py`](hooks/guard_do_not_edit.py))**: `PreToolUse` hook on `edit_file|write_file` that blocks edits matching `do-not-edit` patterns declared in your repository's `saki-dev` dev profile (`AGENTS.md`, `GEMINI.md`, or `CLAUDE.md`).
 
 ## Installation
 
-Send this to your agent:
+### Option 1: Install as an Antigravity Plugin (recommended)
 
-```text
-Please install this skill repository for me: https://github.com/oil-oil/oil-dev-skills
-```
-
-Or install the full set from the terminal:
+Clone or symlink this repository into your global or workspace Antigravity plugins folder:
 
 ```bash
-npx skills add oil-oil/oil-dev-skills
+# Global (all workspaces)
+git clone https://github.com/Yuyushu2499/saki-dev-skills.git ~/.gemini/config/plugins/saki-dev-skills
+
+# Or workspace-specific
+git clone https://github.com/Yuyushu2499/saki-dev-skills.git .agents/plugins/saki-dev-skills
 ```
 
-To install a single skill, pass `--skill`:
+### Option 2: Install standard `skills/` only
 
 ```bash
-npx skills add oil-oil/oil-dev-skills --skill oil-code-review
+npx skills add Yuyushu2499/saki-dev-skills
 ```
 
-No extra configuration is required after installation:
+## Project dev profile (`saki-dev`)
 
-- The scripts in `oil-explore`, `oil-plan`, `oil-code-review`, and `oil-govern` only inspect Git state and file structure. They need no API keys and work with any programming language.
-- On first use, `oil-delegate` detects which CLI agents are installed on your machine and asks which ones you want to enable.
-- When a task type such as code review or plan critique comes up for the first time, `oil-delegate` asks once which agent should handle it and remembers your choice. You can also say things like "Always use codex for reviews from now on." These preferences live in `oil-delegate`'s local config and are never written into the repository.
-- If you previously installed [oil-delegate](https://github.com/oil-oil/oil-delegate) on its own, keep only one copy after installing the full set so you don't end up with duplicate skill names.
-
-## Usage
-
-Tell your agent what you want in plain language. A cross-module feature typically follows this order:
-
-```text
-Use oil-explore to trace the full video export call chain in this repo and list existing components and helpers we can reuse.
-```
-
-```text
-I want to add multi-select batch splitting to the timeline. Use oil-plan to write a plan I can easily follow and list the trade-offs that need my decision. Don't change any code yet.
-```
-
-```text
-The plan looks good. Use oil-delegate to have codex implement it according to the plan and run the relevant quick tests when done.
-```
-
-```text
-Use oil-code-review to review the changes on the current branch, focusing on core logic and packaged runtime behavior.
-```
-
-```text
-Use oil-plan in sub-agent mode for this feature: you only make decisions, and sub-agents do the exploring, coding, and review.
-```
-
-```text
-Use oil-govern to audit the repository—check for stale docs, review the test tiering, and see which worktrees can be cleaned up.
-```
-
-```text
-Use oil-govern to show me the branch board: where each branch is, what it changes, and what I should do with it.
-```
-
-Once review passes, `oil-plan` runs the merge gate from its closing checklist, commits and merges according to the repo's conventions, and cleans up the merged worktree.
-
-When you run into a bug whose cause isn't clear, describe the symptom directly:
-
-```text
-Use oil-bug-fix to investigate: overseas users report that some orders in the daily report are counted under the previous day, and we haven't been able to reproduce it locally.
-```
-
-## Project dev profile (recommended)
-
-Add a section whose heading contains `oil-dev` to the target repository's `AGENTS.md` to record your quick test command, merge gate, high-risk paths, and do-not-edit paths:
+Add a section whose heading contains `saki-dev` to your repository's `AGENTS.md` (or `GEMINI.md`):
 
 ```markdown
-## Dev profile (oil-dev)
+## Dev profile (saki-dev)
 
 - quick-test: `pytest tests/{target} -q`
 - merge-gate: `make ci`
@@ -124,73 +57,20 @@ Add a section whose heading contains `oil-dev` to the target repository's `AGENT
 - do-not-edit: `vendor/`, `src/generated/**`
 ```
 
-Once added, the skills read it directly: `oil-explore` stops guessing test commands, `oil-plan` copies `quick-test` and `merge-gate` into the dispatch contract, and `oil-code-review` flags changes in `high-risk` and `do-not-edit` paths as shown above. Without this section, each skill falls back to its built-in defaults.
-
-If you'd rather not write it by hand, tell your agent: "Use oil-govern to generate a dev profile for this repo." See [dev-profile.md](skills/oil-govern/references/dev-profile.md) for the format and generation steps.
+Once configured, `saki-explore`, `saki-plan`, `saki-code-review`, `saki-govern`, and the `PreToolUse` hook read it directly. See [dev-profile.md](skills/saki-govern/references/dev-profile.md) for all supported keys.
 
 ## Personal preferences
 
-Settings that apply only to you live in `~/.oil-dev/preferences.md` on your machine. All skills in this collection share that single file, with one section per skill written in plain language. Notes directly under a skill heading apply across all host agents, while notes under `### <host-name>` apply only to that host. This file stays out of project repositories; team-wide conventions still belong in the dev profile above.
+User-specific preferences live in `~/.saki-dev/preferences.md` (override with `SAKI_DEV_HOME`). Cross-CLI delegate state lives in `~/.saki-delegate` (override with `SAKI_DELEGATE_HOME`). Neither is written into project repositories.
 
-Currently, `oil-plan` reads it to decide whether sub-agent mode is on by default, and `oil-explore` reads it when fanning out parallel exploration. You can specify how each host should dispatch exploration sub-agents: which mechanism to use, which model to pick, the maximum number of sub-agents, and how to clean them up afterward.
+## Maintenance and testing
 
-```markdown
-## oil-plan
-
-Use sub-agent mode: you only make decisions.
-
-## oil-explore
-
-At most 3 exploration sub-agents.
-
-### antigravity
-
-- Dispatch exploration sub-agents with swarm, using `<model-id>` for each worker.
-- Kill the workers once all briefs are collected.
-
-### claude-code
-
-- Use the Explore sub-agent with the haiku model.
-```
-
-You can edit the file directly or tell your agent to save a preference for you:
-
-```text
-From now on, when using oil-explore in Claude Code, run exploration sub-agents on haiku and dispatch at most 3 of them.
-```
-
-Anything left unspecified uses the default: 2–3 sub-agents on a fast, lightweight model. Preferences for `oil-delegate` (which CLI agents are enabled and which agent handles each task type) are stored in its own config file rather than here.
-
-## Permissions, privacy, and boundaries
-
-- `oil-explore` is strictly read-only. `oil-code-review` and `oil-govern` are also read-only while gathering facts; before editing docs, deleting tests, or removing worktrees, they show the evidence and wait for your confirmation.
-- `oil-plan` does not start cross-module code edits until open trade-offs have your sign-off.
-- Before important operations—merging into the main branch, bulk deletes, deleting branches or worktrees with unmerged commits, rewriting pushed history, changing data formats or database schemas, releasing, or changing public interfaces—an independent read-only agent checks what will be affected, whether it can be undone, and what might be missing. You then confirm with that check in front of you.
-- While isolating a root cause, `oil-bug-fix` only adds tests and temporary diagnostic logs without altering production behavior; it asks before adding automated checks or updating `AGENTS.md` or `REVIEW.md`.
-- When `oil-delegate` runs code reviews, plan critiques, or debugging consultations, it uses read-only mode automatically and verifies afterward that the working tree is untouched. Before dispatching a task that writes code, it requires a clean working tree or an isolated worktree.
-- Prompts and files handed to external CLI agents are sent to their respective model providers and may incur usage costs. Do not include secrets or credentials in task prompts.
-- All helper scripts rely only on the Python 3.10+ standard library. They have been tested on macOS; Linux and Windows have not yet been verified on physical machines.
-- This collection does not handle packaging or release publishing. Signing, notarization, and deployment are product-specific and are best kept as scripts in the target repository.
-
-<details>
-<summary>Maintenance and testing</summary>
-
-Run all unit tests without calling any models (finishes in under a minute):
+Run all unit tests without calling any models:
 
 ```bash
 python3 scripts/verify_repo.py
 ```
 
-If you have [oil-skill-creator](https://github.com/oil-oil/oil-skill-creator) installed, pass `--validator <path-to-oil-skill-creator>/scripts/validate_skill.py` to also check each skill against public authoring guidelines.
+## Attribution & License
 
-`skills/oil-delegate` stays in sync with the standalone [oil-delegate](https://github.com/oil-oil/oil-delegate) repository. When maintaining both, verify they match with:
-
-```bash
-python3 scripts/sync_delegate.py --check
-```
-
-</details>
-
-## License
-
-[MIT](LICENSE)
+Adapted from [oil-oil/oil-dev-skills](https://github.com/oil-oil/oil-dev-skills) under the [MIT License](LICENSE).

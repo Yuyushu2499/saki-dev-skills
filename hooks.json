@@ -1,0 +1,16 @@
+{
+  "saki-do-not-edit-guard": {
+    "PreToolUse": [
+      {
+        "matcher": "edit_file|write_file",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ./hooks/guard_do_not_edit.py",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}
