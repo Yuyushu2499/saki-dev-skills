@@ -18,6 +18,7 @@ metadata:
 - **100% 以真实代码和 `git diff` 为事实源，零臆测**：所有入口路径、命令、配置项、接口字段必须从源码、清单或 CI 中真实核实；代码里看不出来的业务背景或外部约定显式标注 `[待补充]`，严禁脑补。
 - **精准局部更新，不无故重写全文**：增量同步时只更新与本次变更相关的段落与引用，保留原有风格和未受影响的内容；`L1` 内部重构、小样式微调或不影响外部行为/目录/契约的小修补直接判定为“无需更新文档”，不制造噪音 diff。
 - **单源维护，绝不撑爆 `AGENTS.md` / `GEMINI.md`**：详细架构、接口与模块文档落在 `README.md` 和 `docs/` 中；根目录 `AGENTS.md` / `GEMINI.md` 仅在路由表中通过相对链接指向这些文档，绝不把长篇文档抄进常驻规则文件。
+- **智能绘图与可扩展引擎**：文档需要配图（架构图、流程图、数据流图等）时，结合图表复杂度与维护形态自主判断更适合 **Mermaid** 还是本机 **ExcalidrawZ MCP**（或已扩展的其他绘图工具），并通过 `ask_question` 弹出带 `(Recommended)` 推荐项的选项卡片请用户确认后再绘（详见 [文档绘图引擎规范](references/diagram-providers.md)）。
 - **默认纯 Antigravity 内部闭环**：接手大仓库需要并行读源码时，默认使用 `invoke_subagent` 派发只读子 Agent **`saki-explorer`**（`Model: "flash"`，未注册时退回 `research`），不自动触发 `saki-delegate` 或外部 CLI。
 
 ## 先选文档模式
@@ -53,9 +54,10 @@ metadata:
    - 大型或多子系统仓库：按互不重叠的模块目录边界，用 `invoke_subagent` 并行派发 2–3 个只读子 Agent **`saki-explorer`**（`Model: "flash"`）分别梳理各子系统的职责、关键入口（`file:line`）、数据流与对外契约。
 3. **先给规划清单与大纲，等用户确认**：
    阅读 [文档体系与写作模板](references/doc-templates.md)，按“2 核心 + 4 按需”原则提出精简方案（例如：更新 `README.md` + 新建 `docs/architecture.md` + 仅当检测到接口/配置时提议 `docs/api.md`），用几行说明每份文档的定位与核心章节，**经用户确认后再落盘**。
-4. **写入文档并同步路由**：
+4. **写入文档、配图并同步路由**：
    - 用简体中文（除非用户另指定语言）落盘文档；代码里无法确认的业务背景或部署信息标 `[待补充]`。
-   - 核对文档内所有相对路径链接真实存在。
+   - 若文档包含架构图、调用链图或数据流图：阅读 [文档绘图引擎规范](references/diagram-providers.md)，先按图表特征给出推荐（复杂架构全景/多模块拓扑/需手工美化倾向 `ExcalidrawZ MCP`，轻量流程/时序/状态机/ER 图倾向 `Mermaid`），读取 `~/.saki-dev/preferences.md` 与项目 `AGENTS.md` 中已登记的扩展绘图工具，再用 `ask_question` 弹窗确认本次绘图引擎后执行绘图（若所选 MCP 未启动则提示并支持一键回退 Mermaid）。
+   - 核对文档内所有相对路径链接与导出图片路径真实存在。
    - 若仓库存在 `AGENTS.md`（或 `GEMINI.md`），提议在其路由表中补充 1–2 行指向新建 `docs/` 的相对链接（同样先征得同意再改常驻规则文件）。
 
 ### 模式 B：随功能 / 需求迭代 → 按 `git diff` 增量维护（Sync）
@@ -96,5 +98,6 @@ metadata:
 ## 资源导航
 
 - [references/doc-templates.md](references/doc-templates.md)：创建或更新 `README.md`、`docs/architecture.md`、`docs/api.md` / `docs/data-model.md`、`docs/modules/`、ADR 与 `CHANGELOG.md` 时阅读，含精简结构规范与反模式清单。
+- [references/diagram-providers.md](references/diagram-providers.md)：文档需要画架构图、流程图或接入 ExcalidrawZ MCP 及其他自定义绘图工具时阅读，含场景推荐规则、弹窗流程与可扩展契约。
 - [scripts/doc_helper.py](scripts/doc_helper.py)：零第三方依赖的文档现状盘点（`inventory`）与基于 `git diff` 的文档影响面分析脚本（`impact`）。
 - [tests/test_doc_helper.py](tests/test_doc_helper.py)：`doc_helper.py` 的回归测试，仅在修改脚本时运行。

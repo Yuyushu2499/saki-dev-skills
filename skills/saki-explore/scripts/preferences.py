@@ -31,7 +31,7 @@ CONTRACT_VERSION = 1
 HOME_ENV = "SAKI_DEV_HOME"
 FILE_NAME = "preferences.md"
 MAX_TEXT_LENGTH = 4000
-KNOWN_SKILLS = ("saki-explore", "saki-plan", "saki-code-review", "saki-govern")
+KNOWN_SKILLS = ("saki-explore", "saki-plan", "saki-code-review", "saki-govern", "saki-docs")
 NEW_FILE_HEADER = (
     "# saki-dev 个人偏好\n\n"
     "每个 Skill 一节（## Skill 名）。紧跟在 Skill 标题下的文字对所有宿主生效，"
