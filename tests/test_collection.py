@@ -21,6 +21,8 @@ EXPECTED_SKILLS = {
     "saki-govern",
     "saki-bug-fix",
     "saki-docs",
+    "saki-ship",
+    "saki-comment",
 }
 EXPECTED_AGENTS = {
     "saki-explorer",
@@ -82,6 +84,12 @@ class CollectionStructureTest(unittest.TestCase):
         hooks = json.loads(hooks_path.read_text(encoding="utf-8"))
         self.assertIn("saki-do-not-edit-guard", hooks)
         self.assertTrue((REPO_ROOT / "hooks" / "guard_do_not_edit.py").is_file())
+
+        rules_path = REPO_ROOT / "rules" / "AGENTS.md"
+        self.assertTrue(rules_path.is_file(), "Missing rules/AGENTS.md")
+        rules_text = rules_path.read_text(encoding="utf-8")
+        self.assertFalse(rules_text.lstrip().startswith("---"), "Plugin rules/AGENTS.md must not have frontmatter")
+        self.assertLess(rules_path.stat().st_size, 24_000, "rules/AGENTS.md exceeds 24 KB Antigravity limit")
 
     def test_root_readmes_mention_all_skills_and_have_valid_local_links(self) -> None:
         for readme_name in ("README.md", "README.zh-CN.md"):
@@ -183,6 +191,8 @@ class CollectionStructureTest(unittest.TestCase):
             SKILLS_DIR / "saki-code-review" / "scripts" / "review_helper.py",
             SKILLS_DIR / "saki-govern" / "scripts" / "audit_repo.py",
             SKILLS_DIR / "saki-docs" / "scripts" / "doc_helper.py",
+            SKILLS_DIR / "saki-ship" / "scripts" / "ship_helper.py",
+            SKILLS_DIR / "saki-comment" / "scripts" / "comment_helper.py",
         ]
         for script in scripts:
             proc = subprocess.run(

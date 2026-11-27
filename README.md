@@ -8,17 +8,20 @@ By default, every step stays **100% inside Antigravity** using built-in lightwei
 
 ## What is included
 
-### 1. Seven Agent Skills (`skills/`)
+### 1. Nine Agent Skills (`skills/`)
 - **Explore · [`saki-explore`](skills/saki-explore/SKILL.md)**: Read-only codebase inventory, call-chain tracing, reusable infrastructure discovery, and parallel exploration via `saki-explorer` (`flash`).
 - **Plan · [`saki-plan`](skills/saki-plan/SKILL.md)**: Complexity-graded planning (`L1` / `L2` / `L3`), independent plan critique via `saki-reviewer`, strict dispatch contracts with fast-rule test cadence, optional sub-agent mode, and a closing merge checklist.
 - **Code Review · [`saki-code-review`](skills/saki-code-review/SKILL.md)**: Risk-graded code diff review checking scope drift, `do-not-edit` boundaries, file bloat, and five-dimension quality in a clean `saki-reviewer` context.
 - **Bug Fix · [`saki-bug-fix`](skills/saki-bug-fix/SKILL.md)**: Root-cause debugging workflow—reproduce first, trace to the origin, fix at the source, scan systemic patterns, and run dual-path read-only diagnosis via `saki-reviewer` on stop-loss.
 - **Docs · [`saki-docs`](skills/saki-docs/SKILL.md)**: Generates living project documentation from real source code when onboarding a repository (`README.md`, `docs/architecture.md`, and on-demand API/data-model/module/ADR/changelog docs), and incrementally syncs affected docs from `git diff` after user confirmation (Chinese by default).
+- **Comment · [`saki-comment`](skills/saki-comment/SKILL.md)**: Audits and adds idiomatic Chinese code comments & docstrings (Google Python / TSDoc / JSDoc / GoDoc / Rustdoc / Javadoc / Doxygen, explaining *Why* not *What*) while proactively removing misleading, redundant, or commented-out dead-code comments—strictly zero logic changes.
+- **Ship · [`saki-ship`](skills/saki-ship/SKILL.md)**: Pre-ship safety check (branch protection, sensitive files, remote sync) plus Chinese Conventional Commit (`feat:`/`fix:` + Chinese summary) and push—auto-ships on dev branches once tests pass, and pauses for confirmation on `main`/`master`.
 - **Govern · [`saki-govern`](skills/saki-govern/SKILL.md)**: Audits `AGENTS.md` / `GEMINI.md`, test tiering, `.agents/skills/` & `.agents/plugins/`, worktree merge state, and interactive branch boards (rendered via Antigravity `generative_ui` when available).
 - **Delegate · [`saki-delegate`](skills/saki-delegate/SKILL.md)**: Explicit-only cross-CLI delegation (`claude`, `codex`, `agy`, `cursor`, `opencode`, `workbuddy`, `dsh`, `grok`, `kimi`). Never triggered automatically—always prompts with `ask_question` to choose a model (with a task-based `(Recommended)` default) whenever no model is specified in your message.
 
 ### 2. Antigravity Native Enhancements
 - **Plugin manifest ([`plugin.json`](plugin.json))**: Install and toggle the entire bundle as a single plugin in Antigravity while keeping `skills/` compatible with other skill-based coding agents.
+- **Always-on plugin rules ([`rules/AGENTS.md`](rules/AGENTS.md))**: Automatically enforces Chinese commit + post-test delivery on dev branches (with `main`/`master` protection) and idiomatic Chinese commenting + bad-comment cleanup during everyday coding.
 - **Dedicated MCP-stripped subagents ([`agents/`](agents/saki-explorer.md))**:
   - [`saki-explorer`](agents/saki-explorer.md): Strictly read-only (`read_file`, `run_command`, `inheritMcp: false`).
   - [`saki-reviewer`](agents/saki-reviewer.md): Strictly read-only independent critic, reviewer, and risk checker (`inheritMcp: false`).

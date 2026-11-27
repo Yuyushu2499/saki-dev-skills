@@ -1,7 +1,14 @@
+# Python 字节码与缓存
 __pycache__/
 *.py[cod]
-.DS_Store
+*.egg-info/
 .pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# 虚拟环境与系统临时文件
 .venv/
-.data/
-skill-workspaces/
+venv/
+.DS_Store
+.coverage
+htmlcov/

@@ -8,17 +8,20 @@
 
 ## 套件构成
 
-### 1. 七个核心 Skill（`skills/`）
+### 1. 九个核心 Skill（`skills/`）
 - **探索 · [`saki-explore`](skills/saki-explore/SKILL.md)**：严格只读的结构盘点与调用链追踪，大仓库默认按独立模块派发 `saki-explorer`（`flash` 模型）并行摸底。
 - **方案 · [`saki-plan`](skills/saki-plan/SKILL.md)**：按 `L1 / L2 / L3` 分级制定平实方案，默认由 `saki-reviewer` 独立挑刺，生成带测试与重构建控频红线的派发契约，支持子 Agent 模式与收尾合并清单。
 - **审查 · [`saki-code-review`](skills/saki-code-review/SKILL.md)**：先核对方案范围、禁改目录与文件膨胀，再由 `saki-reviewer` 在干净只读上下文执行五维深度审查。
 - **排错 · [`saki-bug-fix`](skills/saki-bug-fix/SKILL.md)**：先复现再定位根因，在坏数据源头修复，判断普遍问题并全仓排查，止损时默认开两路 `saki-reviewer` 并行诊断。
 - **文档 · [`saki-docs`](skills/saki-docs/SKILL.md)**：遵循“2 核心 + 4 按需”活文档体系（默认中文），支持中途接手项目从真实源码反推生成文档，以及随功能迭代按 `git diff` 列出影响清单、经确认后做精准增量同步。
+- **注释 · [`saki-comment`](skills/saki-comment/SKILL.md)**：按多语言行业权威规范（Google Python / TSDoc / JSDoc / GoDoc / Rustdoc / Javadoc / Doxygen）为无注释老项目补全函数文档与核心块中文注释（只解释 Why 不复述 What），同时主动扫描清理过期误导、废话、作者日期与大段注释死代码，严格零逻辑改动。
+- **交付 · [`saki-ship`](skills/saki-ship/SKILL.md)**：交付前分支保护与敏感文件预检 + 中文提交规范（`Conventional Commits` 前缀 + 中文描述）并推送远端；开发分支测试通过后可直接自动提交推送，`main` / `master` 保护分支必须先确认，也可随时手动调用。
 - **治理 · [`saki-govern`](skills/saki-govern/SKILL.md)**：体检并治理 `AGENTS.md` / `GEMINI.md`、`.agents/skills/` 与 `.agents/plugins/`、快慢测试分层、Worktree 卫生，以及支持 Antigravity `generative_ui` 渲染的交互式分支看板。
 - **显式跨 CLI 委托 · [`saki-delegate`](skills/saki-delegate/SKILL.md)**：支持 9 种外部 CLI（`claude`、`codex`、`agy`、`cursor`、`opencode`、`workbuddy`、`dsh`、`grok`、`kimi`）。仅在你显式点名外部 CLI 时触发；只要本次未指明模型，每次均通过 `ask_question` 弹出模型选择卡片并给出按任务推荐的默认模型。
 
 ### 2. Antigravity 原生增强能力
 - **原生 Plugin 清单（[`plugin.json`](plugin.json)）**：可作为单个插件在 Antigravity Customizations 页面一键启停，同时保留标准 `skills/` 结构兼容其他宿主。
+- **插件常驻工程规则（[`rules/AGENTS.md`](rules/AGENTS.md)）**：随插件开启自动生效——开发分支测试通过后自动按 `saki-ship` 中文提交推送（保护主分支），日常写代码自动补合理中文注释并顺手清理劣质注释。
 - **专用轻量净身子 Agent（`agents/`）**：全部设置 `inheritMcp: false` 剥离无关 MCP 底座 Token 开销：
   - [`saki-explorer`](agents/saki-explorer.md)：纯只读探索子 Agent（无 `edit_file`/`write_file`）。
   - [`saki-reviewer`](agents/saki-reviewer.md)：纯只读独立审查、方案挑刺与高危操作检查子 Agent。

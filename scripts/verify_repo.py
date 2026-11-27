@@ -22,6 +22,8 @@ EXPECTED_SKILLS = (
     "saki-govern",
     "saki-bug-fix",
     "saki-docs",
+    "saki-ship",
+    "saki-comment",
 )
 UNIVERSAL_SKILLS = {
     "saki-explore",
@@ -30,6 +32,8 @@ UNIVERSAL_SKILLS = {
     "saki-govern",
     "saki-bug-fix",
     "saki-docs",
+    "saki-ship",
+    "saki-comment",
 }
 
 

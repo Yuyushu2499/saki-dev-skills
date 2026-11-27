@@ -2,7 +2,7 @@
   "name": "saki-dev-skills",
   "displayName": "Saki Dev Skills",
   "version": "1.0.0",
-  "description": "Antigravity 原生工程化开发套件：提供只读探索、分级方案与契约派发、五维代码审查、根因排错、项目文档生成与增量维护、仓库治理与显式跨 CLI 委托，内置专用轻量只读/编码子 Agent 与禁改目录事前拦截钩子。",
+  "description": "Antigravity 原生工程化开发套件：提供只读探索、分级方案与契约派发、五维代码审查、根因排错、活文档维护、规范中文代码注释与清理、仓库治理、中文提交自动推送与显式跨 CLI 委托，内置专用轻量净身子 Agent、常驻工程规则与禁改目录事前拦截钩子。",
   "author": {
     "name": "Yuyushu2499",
     "url": "https://github.com/Yuyushu2499"
