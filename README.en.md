@@ -14,6 +14,7 @@
   <a href="README.md">简体中文</a> ·
   <strong>English</strong> ·
   <a href="#installation">Installation</a> ·
+  <a href="#usage-guide">Usage</a> ·
   <a href="#architecture-overview">Architecture</a> ·
   <a href="https://github.com/Yuyushu2499/saki-dev-skills/issues">Issues</a>
 </p>
@@ -90,6 +91,38 @@ git clone https://github.com/Yuyushu2499/saki-dev-skills.git .agents/plugins/sak
 ```bash
 npx skills add Yuyushu2499/saki-dev-skills
 ```
+
+---
+
+## Usage Guide
+
+No special syntax is required—just describe what you want in plain language (or name the skill directly) in Antigravity chat.
+
+### 1. Typical End-to-End Flow
+
+For a non-trivial feature, the toolkit chains cleanly into five steps:
+
+1. **Explore**: Run `saki-explore` in read-only mode to map call chains, reusable helpers, and real quick-test commands.
+2. **Plan & Implement**: Use `saki-plan` to write a readable plan (critiqued independently by `saki-reviewer`), sign off on trade-offs, implement under a strict contract, and run scoped quick tests.
+3. **Review**: `saki-code-review` checks scope drift, `do-not-edit` boundaries, and file bloat, then dispatches a clean-context `saki-reviewer` for five-dimension deep review on high-risk edits.
+4. **Sync Living Docs**: `saki-docs` analyzes `git diff` to list affected docs and performs targeted incremental updates after your confirmation.
+5. **Ship**: After merge-gate tests pass, `saki-ship` runs pre-flight safety checks, writes a Chinese Conventional Commit, and pushes automatically on dev branches (pausing for confirmation on `main` / `master`).
+
+### 2. How to Invoke Each of the 9 Skills
+
+| Skill | When to use | Example prompts |
+| --- | --- | --- |
+| **`saki-explore`** | Onboarding an unfamiliar repo, tracing call chains, finding reusable modules and real test commands | `Use saki-explore to trace the export pipeline in this repo and list reusable helpers plus the scoped quick-test command.` |
+| **`saki-plan`** | Feature design, refactors, reviewing existing plans, or running decision-only subagent mode | `Use saki-plan to write a readable plan for batch timeline splitting and list open trade-offs. Don't edit code yet.`<br>`Use saki-plan in sub-agent mode: you only make decisions while subagents handle exploring, coding, and review.` |
+| **`saki-code-review`** | Reviewing completed code diffs before delivery, commit, PR, or merge | `Use saki-code-review to review changes on the current branch, focusing on concurrency, data compatibility, and test quality.` |
+| **`saki-bug-fix`** | Investigating errors, crashes, wrong results, or flaky failures with an unknown cause | `Use saki-bug-fix to investigate: overseas users report orders counted under the previous day. Reproduce first, then find the root cause.` |
+| **`saki-docs`** | Bootstrapping docs from source code on a handoff repo, syncing docs from `git diff`, or drawing diagrams via ExcalidrawZ / Mermaid | `Use saki-docs to read this codebase and propose a README and architecture doc.`<br>`Use saki-docs to check which docs are impacted by our recent changes and sync them.`<br>`Use saki-docs with ExcalidrawZ to draw an architecture overview with software icons.` |
+| **`saki-comment`** | Adding missing Chinese docstrings & core-block comments to legacy code, and deleting stale, redundant, or commented-out dead-code comments | `Use saki-comment on src/core to add idiomatic Chinese docstrings and Why-comments, and remove misleading/redundant/dead-code comments without changing logic.` |
+| **`saki-ship`** | Running pre-ship safety checks, generating a Chinese Conventional Commit, and pushing to remote | `Tests are green—use saki-ship to verify changes, commit in Chinese, and push to origin.` |
+| **`saki-govern`** | Auditing stale docs & bloated `AGENTS.md`, tiering fast/slow tests, generating a `saki-dev` dev profile, or viewing the branch board | `Use saki-govern to show the branch board: where every branch lives, what it changes, and what I should do.`<br>`Use saki-govern to audit docs, tests, and worktrees and draft a saki-dev dev profile.` |
+| **`saki-delegate`** | **Explicit-only** delegation to external CLIs (always pops up an interactive model picker with a task-based recommendation when no model is specified) | `Use codex to independently review the high-risk changes on this branch.`<br>`Ask claude to critique the plan we just wrote.` |
+
+> **Tip**: Whenever the plugin is enabled, [`rules/AGENTS.md`](rules/AGENTS.md) stays active automatically—new/modified code gets idiomatic Chinese comments with bad-comment cleanup, and verified dev-branch work ships via `saki-ship` without needing manual reminders.
 
 ---
 

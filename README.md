@@ -14,6 +14,7 @@
   <strong>简体中文</strong> ·
   <a href="README.en.md">English</a> ·
   <a href="#安装方式">安装方式</a> ·
+  <a href="#使用指南">使用指南</a> ·
   <a href="#架构全景">架构全景</a> ·
   <a href="https://github.com/Yuyushu2499/saki-dev-skills/issues">问题反馈 (Issues)</a>
 </p>
@@ -90,6 +91,38 @@ git clone https://github.com/Yuyushu2499/saki-dev-skills.git .agents/plugins/sak
 ```bash
 npx skills add Yuyushu2499/saki-dev-skills
 ```
+
+---
+
+## 使用指南
+
+安装启用后不需要记任何复杂命令，在 Antigravity 对话框里用**自然语言**直接描述需求（或点名对应 Skill）即可。
+
+### 1. 典型研发串联流程
+
+以开发一个跨模块新功能为例，整套套件会自然串联成 5 步闭环：
+
+1. **摸底查代码**：先用 `saki-explore` 只读查清现有调用链、可复用基建与局部快测命令；
+2. **写方案并实现**：用 `saki-plan` 出人看得懂的方案（自动由 `saki-reviewer` 挑刺）→ 你确认取舍后按契约编码并跑局部快测；
+3. **独立把关**：实现完成后自动衔接 `saki-code-review`，先查越界/禁改/文件膨胀，高风险改动自动开干净只读的 `saki-reviewer` 五维深审；
+4. **同步活文档**：合并前经 `saki-docs` 按真实 `git diff` 列出受影响文档清单，你确认后精准增量更新；
+5. **中文提交推送**：跑通合并门禁后由 `saki-ship` 安全预检，在开发分支自动中文 `commit + push`（若在 `main` / `master` 保护分支则会先向你确认）。
+
+### 2. 九个 Skill 逐一使用示例
+
+| Skill | 什么时候用 | 直接在对话框里这样说 |
+| --- | --- | --- |
+| **`saki-explore`** | 接手陌生仓库、定位模块入口、盘点可复用组件与真实快测入口 | `用 saki-explore 梳理这个项目的导出模块调用链，列出可复用组件和局部快测命令。` |
+| **`saki-plan`** | 常规功能开发、跨模块重构、审阅现成方案或开启纯决策「子 Agent 模式」 | `我想给时间线加上批量拆分功能，用 saki-plan 写一份看得懂的方案并列出待拍板取舍，先不改代码。`<br>`用 saki-plan 子 Agent 模式推进这个需求：你只做决策，探索、编码和审查全部交给子 Agent。` |
+| **`saki-code-review`** | 功能开发/重构/修 Bug 后交付、提交、提 PR 或合并前审查隐患 | `用 saki-code-review 审查当前分支的改动，重点查并发安全、数据兼容和测试质量。` |
+| **`saki-bug-fix`** | 遇到原因不明的报错、崩溃、结果不对或偶发失败 | `用 saki-bug-fix 排查：海外用户反馈每日报表里有订单被算到了前一天，先写复现测试再找根因。` |
+| **`saki-docs`** | 中途接手项目从源码反推活文档；功能改完按 diff 增量更新；用 ExcalidrawZ / Mermaid 画架构图 | `我刚接手这个仓库，用 saki-docs 通读代码帮我规划并生成 README 和架构文档。`<br>`刚做完这个功能，用 saki-docs 检查本次改动影响了哪些文档并同步更新。`<br>`用 saki-docs 结合 ExcalidrawZ 给这个系统画一张带软件图标的架构全景图。` |
+| **`saki-comment`** | 老项目缺少函数/核心逻辑注释需要批量补全；或清理过期误导、废话注释与大段注释死代码 | `用 saki-comment 扫描 src/core 目录，补全缺失的中文函数注释和核心块注释，并清理过期/废话注释和注释掉的死代码，严禁改逻辑。` |
+| **`saki-ship`** | 测试通过后自动或手动执行安全预检、生成中文提交信息并推送云端 | `测试已经全通过了，用 saki-ship 帮我检查改动、写中文 commit 并推送到远端。` |
+| **`saki-govern`** | 阶段性体检文档死链与 `AGENTS.md` 臃肿、拆分慢测试、生成 `saki-dev` 开发约定或看分支看板 | `用 saki-govern 给我展示这个仓库的分支看板，告诉我每条分支改了什么、该怎么处理。`<br>`用 saki-govern 体检当前仓库的文档、测试分层和 Worktree，并帮我生成 saki-dev 开发约定。` |
+| **`saki-delegate`** | **仅需跨工具/跨模型时显式点名外部 CLI**（平时默认纯 Antigravity 闭环；未指明模型时每次必弹模型选择卡片并附推荐项） | `用 codex 独立 review 一下当前分支的高风险改动。`<br>`让 claude 给刚才的方案挑个刺。` |
+
+> **小提示**：日常写代码时，插件内置的 [`rules/AGENTS.md`](rules/AGENTS.md) 会自动生效——新写/修改核心函数会自动附上规范中文注释并清理劣质注释，开发分支测通后会自动按 `saki-ship` 中文提交推送，无需每次手动提醒。
 
 ---
 
